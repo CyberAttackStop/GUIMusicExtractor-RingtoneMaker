@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from PIL import Image, ImageTk
 
 
 class FileInfo(ctk.CTkFrame):
@@ -13,12 +14,47 @@ class FileInfo(ctk.CTkFrame):
         )
         title.pack(pady=20)
 
-        self.info = ctk.CTkTextbox(self)
+        # ==========================
+        # Main Content Frame
+        # ==========================
 
-        self.info.pack(
-            fill="both",
-            expand=True,
-            padx=20,
+        self.content = ctk.CTkFrame(self)
+        self.content.pack(fill="both", expand=True, padx=20, pady=10)
+
+        self.content.grid_columnconfigure(0, weight=0)
+        self.content.grid_columnconfigure(1, weight=1)
+        self.content.grid_rowconfigure(0, weight=1)
+
+        # ==========================
+        # Thumbnail
+        # ==========================
+
+        self.thumbnail_label = ctk.CTkLabel(
+            self.content,
+            text="No Preview",
+            width=320,
+            height=180
+        )
+
+        self.thumbnail_label.grid(
+            row=0,
+            column=0,
+            padx=15,
+            pady=15,
+            sticky="n"
+        )
+
+        # ==========================
+        # Metadata
+        # ==========================
+
+        self.info = ctk.CTkTextbox(self.content)
+
+        self.info.grid(
+            row=0,
+            column=1,
+            sticky="nsew",
+            padx=10,
             pady=10
         )
 
@@ -33,30 +69,92 @@ class FileInfo(ctk.CTkFrame):
             "No file selected."
         )
 
+        self.thumbnail_label.configure(
+            image=None,
+            text="No Preview"
+        )
+
+    def set_thumbnail(self, image):
+
+        image = ctk.CTkImage(
+            light_image=image,
+            dark_image=image,
+            size=(320, 180)
+        )
+
+        self.thumbnail_label.configure(
+            image=image,
+            text=""
+        )
+
+        self.thumbnail_label.image = image
+
     def update_info(self, data):
 
         self.info.delete("1.0", "end")
 
         text = f"""
-File Name :
+🎵 File Name
 
 {data['name']}
 
--------------------------------------------------
+────────────────────────────
 
-File Type :
+⏱ Duration
 
-{data['type']}
+{data['duration']}
 
--------------------------------------------------
+────────────────────────────
 
-File Size :
+📺 Resolution
 
-{data['size']}
+{data['resolution']}
 
--------------------------------------------------
+────────────────────────────
 
-Location :
+🎥 Video Codec
+
+{data['video_codec']}
+
+────────────────────────────
+
+🎧 Audio Codec
+
+{data['audio_codec']}
+
+────────────────────────────
+
+🎼 Bitrate
+
+{data['bitrate']}
+
+────────────────────────────
+
+📊 FPS
+
+{data['fps']}
+
+────────────────────────────
+
+🔊 Channels
+
+{data['channels']}
+
+────────────────────────────
+
+🎚 Sample Rate
+
+{data['sample_rate']}
+
+────────────────────────────
+
+💾 File Size
+
+{data['size']} MB
+
+────────────────────────────
+
+📁 Location
 
 {data['path']}
 """
