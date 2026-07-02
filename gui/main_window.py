@@ -18,6 +18,8 @@ import time
 
 from core.audio_extractor import AudioExtractor
 
+from core.thread_worker import Worker
+
 class MainWindow(ctk.CTk):
 
     def __init__(self):
@@ -202,6 +204,14 @@ class MainWindow(ctk.CTk):
     # ===============================
 
     def extract_audio(self):
+
+        worker = Worker(
+            target=self.start_audio_extraction
+        )
+
+        worker.start()
+    
+    def start_audio_extraction(self):
 
         if not self.current_file:
             messagebox.showwarning(
