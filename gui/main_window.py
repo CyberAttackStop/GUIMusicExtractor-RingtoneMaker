@@ -20,6 +20,8 @@ from core.audio_extractor import AudioExtractor
 
 from core.thread_worker import Worker
 
+from gui.progress_dialog import ProgressDialog
+
 class MainWindow(ctk.CTk):
 
     def __init__(self):
@@ -205,6 +207,21 @@ class MainWindow(ctk.CTk):
 
     def extract_audio(self):
 
+        self.progress_dialog = ProgressDialog(self)
+        self.sidebar.disable_controls()
+        self.progress_dialog.update()
+
+        self.progress_dialog.lift()
+
+        self.progress_dialog.focus_force()
+        
+
+        import os
+
+        self.progress_dialog.set_file(
+            os.path.basename(self.current_file)
+        )
+        
         worker = Worker(
             target=self.start_audio_extraction
         )
@@ -236,7 +253,8 @@ class MainWindow(ctk.CTk):
 
             AudioExtractor.extract(
                 self.current_file,
-                output_file
+                output_file,
+                progress_callback=self.update_progress
             )
 
             self.status.set_status(
@@ -246,8 +264,11 @@ class MainWindow(ctk.CTk):
             messagebox.showinfo(
                 "Success",
                 "Audio extraction completed."
+                
             )
 
+            self.after(0, self.sidebar.enable_controls)
+        
         except Exception as e:
 
             messagebox.showerror(
@@ -255,11 +276,23 @@ class MainWindow(ctk.CTk):
                 str(e)
             )
 
+        self.after(0,self.sidebar.enable_controls)
+
+        self.progress_dialog.destroy()
+
     def create_ringtone(self):
         self.status.set_status("Create Ringtone - Coming Soon")
 
     def open_settings(self):
         self.status.set_status("Settings - Coming Soon")
+
+    
+    def update_progress(self, value):
+
+        self.after(
+            0,
+            lambda: self.progress_dialog.set_progress(value)
+        )
 
 
    

@@ -151,3 +151,36 @@ class Sidebar(ctk.CTkFrame):
             text="Settings"
         )
         self.settings_btn.pack(fill="x", padx=15, pady=8)
+
+    def disable_controls(self):
+
+        self.browse_btn.configure(state="disabled")
+
+        self.play_btn.configure(state="disabled")
+
+        self.pause_btn.configure(state="disabled")
+
+        self.stop_btn.configure(state="disabled")
+
+        self.extract_btn.configure(state="disabled")
+
+        self.ringtone_btn.configure(state="disabled")
+
+        self.settings_btn.configure(state="disabled")
+
+
+    def enable_controls(self):
+
+        self.browse_btn.configure(state="normal")
+
+        self.play_btn.configure(state="normal")
+
+        self.pause_btn.configure(state="normal")
+
+        self.stop_btn.configure(state="normal")
+
+        self.extract_btn.configure(state="normal")
+
+        self.ringtone_btn.configure(state="normal")
+
+        self.settings_btn.configure(state="normal")
