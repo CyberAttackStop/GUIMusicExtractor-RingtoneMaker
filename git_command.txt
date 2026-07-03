@@ -1,4 +1,0 @@
-feat: add ffprobe metadata reader
-feat: implement audio extraction with ffmpeg
-feat: integrate Demucs source separation
-feat: add waveform-based ringtone editor
