@@ -84,13 +84,26 @@ class Sidebar(ctk.CTkFrame):
         self.extract_btn.pack(fill="x", padx=15, pady=8)
 
         # ==========================
+        # Separate Vocals
+        # ==========================
+        
+        self.separate_btn = ctk.CTkButton(
+            self,
+            text="🎤 Separate Vocals",
+            command=self.master.separate_audio
+        )
+
+        self.separate_btn.pack(fill="x", padx=10, pady=8)
+                
+        
+        # ==========================
         # Create Ringtone
         # ==========================
 
         self.ringtone_btn = ctk.CTkButton(
             self,
             text="Create Ringtone",
-            command=self.master.create_ringtone
+            command=self.master.open_ringtone_editor
         )
 
         self.ringtone_btn.pack(fill="x", padx=15, pady=8)

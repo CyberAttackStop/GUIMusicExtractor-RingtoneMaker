@@ -16,11 +16,18 @@ from gui.player_controls import PlayerControls
 
 import time
 
+import os
+
 from core.audio_extractor import AudioExtractor
 
 from core.thread_worker import Worker
 
 from gui.progress_dialog import ProgressDialog
+
+from gui.ringtone_editor import RingtoneEditor
+
+from core.uvr_engine import UVREngine
+import threading
 
 class MainWindow(ctk.CTk):
 
@@ -280,8 +287,22 @@ class MainWindow(ctk.CTk):
 
         self.progress_dialog.destroy()
 
+
+
     def create_ringtone(self):
-        self.status.set_status("Create Ringtone - Coming Soon")
+
+        if not self.current_file:
+
+            messagebox.showwarning(
+                "No File",
+                "Please load a media file first."
+            )
+
+            return
+
+        self.open_ringtone_editor()
+
+
 
     def open_settings(self):
         self.status.set_status("Settings - Coming Soon")
@@ -295,7 +316,105 @@ class MainWindow(ctk.CTk):
         )
 
 
-   
-   
-    
+    def open_ringtone_editor(self):
 
+        if not self.current_file:
+
+            messagebox.showwarning(
+                "No File",
+                "Please load a media file first."
+            )
+
+            return
+
+        RingtoneEditor(self, self.current_file)
+
+    def separate_audio(self):
+
+        if not self.current_file:
+            self.status.set_status("Select a media file first.")
+            return
+
+        try:
+
+            self.status.set_status("Preparing audio...")
+
+            # If it's a video, extract audio first
+            if self.current_file.lower().endswith(
+                (".mp4", ".avi", ".mkv", ".mov")
+            ):
+
+                os.makedirs("output/extracted", exist_ok=True)
+
+                filename = os.path.splitext(
+                    os.path.basename(self.current_file)
+                )[0]
+
+                extracted = os.path.join(
+                    "output",
+                    "extracted",
+                    filename + ".mp3"
+                )
+
+                FFmpegEngine.extract_audio(
+                    self.current_file,
+                    extracted
+                )
+
+                input_audio = extracted
+
+            else:
+
+                input_audio = self.current_file
+
+            self.status.set_status("Running AI Separation...")
+
+            print("Current File:", self.current_file)
+            print("Input Audio:", input_audio)
+
+            self.current_file = input_audio
+
+            import threading
+
+            threading.Thread(
+                target=self.run_ai_separation,
+                daemon=True
+            ).start()
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Error",
+                str(e)
+            )
+
+            self.status.set_status("Failed")
+   
+    def run_ai_separation(self):
+
+        try:
+
+            self.status.set_status("Running AI Separation...")
+
+            output_folder = UVREngine.separate(self.current_file)
+
+            self.after(
+                0,
+                lambda: self.ai_finished(output_folder)
+            )
+
+        except Exception as e:
+
+            self.after(
+                0,
+                lambda: messagebox.showerror("Error", str(e))
+            )
+
+    def ai_finished(self, output_folder):
+
+        self.status.set_status("Finished!")
+
+        messagebox.showinfo(
+            "Success",
+            f"Files saved in\n\n{output_folder}"
+        )

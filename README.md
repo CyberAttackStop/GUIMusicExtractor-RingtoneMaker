@@ -1,52 +1,39 @@
-# GUI Music Extractor + Ringtone Maker
+# 🎵 GUIMusicExtractor+RingtoneMaker
 
 A modern desktop application built with Python and CustomTkinter.
 
 ## Features
 
-- Browse audio and video files
-- Display media information
-- Extract audio from videos
-- Create custom ringtones
-- Built-in music player
-- Modern dark interface
+- 🎬 Video Player
+- 🎵 Audio Player
+- 🎧 MP3 Extraction
+- ✂️ Ringtone Creator
+- 🖼 Thumbnail Generator
+- 📊 Media Information
+- 🎚 Volume Control
 
-## Technologies
+## Screenshots
 
-- Python 3.11
-- CustomTkinter
+(We'll add screenshots later.)
+
+## Installation
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+## Requirements
+
+- Python 3.11+
 - FFmpeg
-- Pydub
-- Python-VLC
-- Matplotlib
+- VLC Media Player
+- CustomTkinter
 
-## Project Structure
+## Roadmap
 
-```
-GUIMusicExtractor+RingtoneMaker/
-├── app.py
-├── gui/
-├── core/
-├── assets/
-├── output/
-├── temp/
-└── README.md
-```
-
-## Current Progress
-
-- Project setup
-- Modular GUI
-- Sidebar
-- File browser
-- File information panel
-- Status bar
-
-## Upcoming Features
-
-- FFmpeg integration
-- Audio extraction
-- Audio player
-- Waveform editor
-- Ringtone creator
-- Export manager
+- [x] Audio Extraction
+- [ ] Waveform Editor
+- [ ] Theme Manager
+- [ ] Playlist Support
+- [ ] Installer
