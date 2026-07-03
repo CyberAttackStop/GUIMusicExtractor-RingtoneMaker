@@ -1,33 +1,38 @@
-# Virtual Environment
-venv/
-.venv/
-
 # Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
 
-# VS Code
+# Virtual Environment
+venv/
+.env
+
+# IDE
 .vscode/
+.idea/
+
+# OS Files
+Thumbs.db
+.DS_Store
 
 # Build
 build/
 dist/
 *.spec
 
-# Logs
-logs/
-
 # Temporary Files
 temp/
-
-# Output Files
 output/
+*.log
 
-# OS Files
-Thumbs.db
-.DS_Store
+# Python cache
+.pytest_cache/
+.mypy_cache/
 
-# FFmpeg binaries (if copied into the project)
-ffmpeg/
+# UVR Models (optional if very large)
+models/
+
+# Generated waveform/temp files
+temp/*.wav
+temp/*.png

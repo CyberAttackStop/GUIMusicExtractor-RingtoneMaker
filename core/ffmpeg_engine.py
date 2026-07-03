@@ -50,17 +50,25 @@ class FFmpegEngine:
             "fps": "--",
             "bitrate": "--",
             "sample_rate": "--",
-            "channels": "--"
+            "channels": "--",
+            "duration_seconds": 0.0
         }
 
         # Format information
         fmt = data.get("format", {})
 
         duration = fmt.get("duration")
+
         if duration:
+
             duration = float(duration)
+
+            info["duration_seconds"] = duration
+
             minutes = int(duration // 60)
+
             seconds = int(duration % 60)
+
             info["duration"] = f"{minutes:02}:{seconds:02}"
 
         bitrate = fmt.get("bit_rate")

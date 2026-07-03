@@ -13,8 +13,8 @@ class ProgressDialog(ctk.CTkToplevel):
 
         self.resizable(False, False)
 
-        self.grab_set()
         self.transient(master)
+        self.grab_set()
         self.lift()
         self.focus_force()
         self.attributes("-topmost", True)
