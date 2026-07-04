@@ -24,6 +24,7 @@ class RingtoneEditor(ctk.CTkToplevel):
         self.media_file = media_file
 
         self.player = MediaPlayer()
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         self.title("Professional Ringtone Studio")
 
@@ -205,7 +206,6 @@ class RingtoneEditor(ctk.CTkToplevel):
         self.media_duration = FFmpegEngine.get_media_info(
         self.media_file
         )["duration_seconds"]
-        
         
 
         self.update_time_labels()
@@ -556,3 +556,26 @@ class RingtoneEditor(ctk.CTkToplevel):
                 str(e)
 
             )
+
+    def on_close(self):
+        try:
+            self.player.stop()
+        except Exception:
+            pass
+
+        self.destroy()
+
+    def on_close(self):
+        try:
+            self.player.stop()
+
+            if hasattr(self.player, "player"):
+                self.player.player.stop()
+
+            if hasattr(self.player, "instance"):
+                self.player.instance.release()
+
+        except Exception as e:
+            print(e)
+
+        self.destroy()

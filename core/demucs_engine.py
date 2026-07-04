@@ -22,6 +22,7 @@ class DemucsEngine:
             output_folder,
             input_file,
         ]
+        print("Input file:", input_file)
 
         process = subprocess.run(
             command,

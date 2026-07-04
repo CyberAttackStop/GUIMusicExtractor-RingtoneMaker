@@ -29,6 +29,9 @@ from gui.ringtone_editor import RingtoneEditor
 from core.uvr_engine import UVREngine
 import threading
 
+from core.uvr_engine import SeparationLogHandler
+from gui.settings_window import SettingsWindow
+
 class MainWindow(ctk.CTk):
 
     def __init__(self):
@@ -303,9 +306,27 @@ class MainWindow(ctk.CTk):
         self.open_ringtone_editor()
 
 
-
     def open_settings(self):
-        self.status.set_status("Settings - Coming Soon")
+
+        try:
+
+            # Prevent multiple Settings windows
+            if hasattr(self, "settings_window") and self.settings_window.winfo_exists():
+                self.settings_window.focus()
+                return
+
+            self.settings_window = SettingsWindow(self)
+
+            self.status.set_status("Settings")
+
+        except Exception as e:
+
+            from tkinter import messagebox
+
+            messagebox.showerror(
+                "Settings",
+                str(e)
+            )
 
     
     def update_progress(self, value):
@@ -369,6 +390,14 @@ class MainWindow(ctk.CTk):
 
             self.status.set_status("Running AI Separation...")
 
+            from gui.separation_progress import SeparationProgress
+
+            self.progress_window = SeparationProgress(
+                self,
+                os.path.basename(input_audio),
+                "BS-RoFormer"
+            )
+
             print("Current File:", self.current_file)
             print("Input Audio:", input_audio)
 
@@ -390,13 +419,132 @@ class MainWindow(ctk.CTk):
 
             self.status.set_status("Failed")
    
+    # def run_ai_separation(self):
+
+    #     try:
+
+    #         self.status.set_status("Running AI Separation...")
+
+    #         output_folder = UVREngine.separate(self.current_file)
+
+    #         self.after(
+    #             0,
+    #             lambda: self.ai_finished(output_folder)
+    #         )
+
+    #     except Exception as e:
+
+    #         self.after(
+    #             0,
+    #             lambda: messagebox.showerror("Error", str(e))
+    #         )
+
     def run_ai_separation(self):
 
         try:
 
             self.status.set_status("Running AI Separation...")
 
+            self.after(
+                0,
+                lambda: self.progress_window.log("Loading AI model...")
+            )
+
+            from core.uvr_engine import SeparationLogHandler
+
+            def update_log(msg):
+
+                self.progress_window.log(msg)
+
+                text = msg.lower()
+
+                # --------------------------
+                # Loading model
+                # --------------------------
+                if "loading model" in text:
+                    self.progress_window.set_status("Loading model...")
+                    self.progress_window.set_progress(0.05)
+
+                # --------------------------
+                # Reading audio
+                # --------------------------
+                elif "audio duration" in text:
+                    self.progress_window.set_status("Reading audio...")
+                    self.progress_window.set_progress(0.12)
+
+                # --------------------------
+                # Preparing chunks
+                # --------------------------
+                elif "processing" in text:
+                    self.progress_window.set_status("Preparing chunks...")
+                    self.progress_window.set_progress(0.25)
+
+                # --------------------------
+                # Separating
+                # --------------------------
+                elif (
+                    "separator" in text
+                    or "inference" in text
+                    or "chunk" in text
+                    or "segment" in text
+                ):
+
+                    current = self.progress_window.progress.get()
+
+                    if current < 0.38:
+                        self.progress_window.set_progress(0.38)
+
+                    elif current < 0.45:
+                        self.progress_window.set_progress(0.45)
+
+                    elif current < 0.52:
+                        self.progress_window.set_progress(0.52)
+
+                    elif current < 0.67:
+                        self.progress_window.set_progress(0.67)
+
+                    self.progress_window.set_status("Separating...")
+
+                # --------------------------
+                # Saving
+                # --------------------------
+                elif "saving" in text:
+                    self.progress_window.set_status("Saving vocals...")
+                    self.progress_window.set_progress(0.83)
+
+                # --------------------------
+                # Writing WAV
+                # --------------------------
+                elif "writing output" in text:
+                    self.progress_window.set_status("Writing WAV...")
+                    self.progress_window.set_progress(0.95)
+
+                # --------------------------
+                # Finished
+                # --------------------------
+                elif "separation duration" in text:
+                    self.progress_window.set_status("Finished")
+                    self.progress_window.set_progress(1.00)
+
+            # -------------------------------------------------
+            # Register callback BEFORE starting separation
+            # -------------------------------------------------
+
+            SeparationLogHandler.callback = lambda msg: self.after(
+                0,
+                lambda: update_log(msg)
+            )
+
+            # -------------------------------------------------
+            # Start AI Separation
+            # -------------------------------------------------
+
             output_folder = UVREngine.separate(self.current_file)
+
+            self.after(
+                0,
+                lambda: self.progress_window.finish()
+            )
 
             self.after(
                 0,
@@ -407,12 +555,20 @@ class MainWindow(ctk.CTk):
 
             self.after(
                 0,
+                lambda: self.progress_window.log(f"ERROR: {e}")
+            )
+
+            self.after(
+                0,
                 lambda: messagebox.showerror("Error", str(e))
             )
 
     def ai_finished(self, output_folder):
 
-        self.status.set_status("Finished!")
+        if hasattr(self, "progress_window"):
+            # self.progress_window.close()
+
+            self.status.set_status("Finished!")
 
         messagebox.showinfo(
             "Success",
